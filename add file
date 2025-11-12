@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <title>To-Do Supabase</title>
+</head>
+<body>
+  <h1>To-Do (Supabase)</h1>
+  <input id="t" placeholder="Título da tarefa">
+  <button id="add">Adicionar</button>
+  <ul id="list"></ul>
+
+  <!-- Incluindo a biblioteca Supabase JS -->
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <script>
+    // Substitua pela sua URL e chave pública anônima
+    const SUPABASE_URL = "https://tyvyxjzrujtjnunubptk.supabase.co" // Substitua com a URL do seu projeto
+    const SUPABASE_ANON_KEY = "sb_publishable_Irvu99TGHVtUa5LVwXFOdw_iiZzjrTe"  // Substitua com a chave pública anônima
+
+    // Criando o cliente do Supabase
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // Função para carregar a lista de tarefas
+    async function carregar(){
+      const { data } = await supabase.from('todos').select('*').order('created_at', { ascending: false });
+      document.getElementById('list').innerHTML = (data || [])
+        .map(i => `<li>${i.title} - ${i.is_complete ? '✅' : '⬜'}</li>`)
+        .join('');
+    }
+
+    // Função para adicionar uma nova tarefa
+    async function adicionar(){
+      const title = document.getElementById('t').value.trim();
+      if (!title) return;
+      await supabase.from('todos').insert({ title });
+      document.getElementById('t').value = '';
+      carregar();
+    }
+
+    // Configurando o botão de adicionar tarefa
+    document.getElementById('add').onclick = adicionar;
+
+    // Carregar as tarefas ao iniciar
+    carregar();
+  </script>
+</body>
+</html>
